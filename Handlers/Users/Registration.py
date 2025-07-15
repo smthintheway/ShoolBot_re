@@ -36,7 +36,7 @@ async def start_handler(msg: types.Message,state: FSMContext):
 @Registration_Router.message(F.text,User_fsm.updating_form)
 async def edit_user_form(msg: types.Message,state: FSMContext):
     try:
-        with open('../../Core/settings.json') as f:
+        with open('Core/settings.json') as f:
             config = json.load(f)
 
         Forms = config['Forms']

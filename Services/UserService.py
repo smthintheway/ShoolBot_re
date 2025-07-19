@@ -1,23 +1,27 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
 from Infrastructure.Tables.Users import Users
+from abc import ABC,abstractmethod
 
+class IUserRepository(ABC):
+    @abstractmethod
+    async def get_user(self, tg_id) -> Users|None: ...
 
-class IUserRepository():
+    @abstractmethod
+    async def reg_or_update(self,tg_id) -> Users: ...
+
+class UserRepository():
     def __init__(self,session: AsyncSession):
         self.session = session
 
     async def get_user(self, tg_id: int) -> Users | None:
         result = await self.session.execute(select(Users).filter(Users.tg_id == tg_id))
-        await self.session.commit()
         return result.scalar()
 
 
     async def reg_or_update(self,user: dict) -> Users | None:
-        try:
-            old_user = await self.get_user(user['tg_id'])
-            if old_user is None:
+            existing = await self.get_user(user['tg_id'])
+            if existing is None:
                 new_user = Users(tg_id = user['tg_id'],
                                      username = user['username'],
                                      form = user['form'],
@@ -25,44 +29,41 @@ class IUserRepository():
                                      privileges = user['privileges'])
                 self.session.add(new_user)
             else:
-                old_user.username = user['username'] or old_user.username
-                old_user.form = user['form'] or old_user.form
-                old_user.group= user['group'] or old_user.group
-                old_user.privileges = user['privileges'] or old_user.privileges
+                existing.username = user['username'] or existing.username
+                existing.form = user['form'] or existing.form
+                existing.group= user['group'] or existing.group
+                existing.privileges = user['privileges'] or existing.privileges
 
             await self.session.commit()
-            return old_user
-
-        except Exception as error:
-            print(error)
+            return existing
 
 
 class UserService:
-    def __init__(self, repo: IUserRepository):
+    def __init__(self, repo: UserRepository):
         self._repo = repo
 
     async def registration(self,user: dict) -> Users | None:
-        try:
-            return await self._repo.reg_or_update(user)
-        except Exception as error:
-            print(error)
+        return await self._repo.reg_or_update(user)
+
 
     async def get_user_reg(self,tg_id: int):
-        try:
             return await self._repo.get_user(tg_id)
-        except Exception as error:
-            print(error)
+
 
     async def get_user_info(self,tg_id: int) -> dict[str,int] | None:
-        try:
             user = await self._repo.get_user(tg_id)
-            data = {
+            if user is None:
+                return None
+            return await User_info_DTO.user_info_show(user = user)
+
+
+class User_info_DTO:
+    @staticmethod
+    async def user_info_show(user: Users) -> dict[str, int]:
+        return {
                 'username': user.username,
                 'tg_id': user.tg_id,
                 'form': user.form,
                 'group': user.group,
                 'privileges': user.privileges
             }
-            return data
-        except Exception as error:
-            print(error)

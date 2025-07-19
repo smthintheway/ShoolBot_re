@@ -1,5 +1,4 @@
 import json
-from aiogram.filters.command import Command
 from aiogram import types,Router,F
 from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import async_session, AsyncSession, create_async_engine
@@ -10,31 +9,29 @@ from Services.UserService import UserService,UserRepository
 from Presentation.Keyboards.Mini_keyboards import Menu_button_keyboard
 from Presentation.Keyboards.Main_menu import main_menu
 
+
 database_engine = create_async_engine('sqlite+aiosqlite:///main.db')
 async_session = sessionmaker(database_engine,class_=AsyncSession,expire_on_commit=False)
 
-Registration_Router = Router()
+User_data_update_Router = Router()
 
 
-@Registration_Router.message(Command('start'))
-async def start_handler(msg: types.Message,state: FSMContext):
+@User_data_update_Router.callback_query(F.data == 'Change_user_data')
+async def start_handler(callback: types.CallbackQuery,state: FSMContext):
     try:
         async with async_session() as session:
             us_repo = UserRepository(session)
             user_service = UserService(us_repo)
 
-            check = await user_service.get_user_reg(msg.from_user.id)
-            if check is None:
-                await msg.answer(text=greeting)
-                await msg.answer(text=user_edit_form)
+            check = await user_service.get_user_reg(callback.from_user.id)
+            if not(check is None):
+                await callback.message.answer(text=user_edit_form)
                 await state.set_state(User_fsm.updating_form)
-            else:
-                await msg.answer(text = greeting,reply_markup=Menu_button_keyboard)
     except Exception as error:
         print(error)
 
 
-@Registration_Router.message(F.text,User_fsm.updating_form)
+@User_data_update_Router.message(F.text,User_fsm.updating_form)
 async def edit_user_form(msg: types.Message,state: FSMContext):
     try:
         with open('Core/settings.json') as f:
@@ -52,7 +49,7 @@ async def edit_user_form(msg: types.Message,state: FSMContext):
         print(error)
 
 
-@Registration_Router.message(F.text, User_fsm.updating_group)
+@User_data_update_Router.message(F.text, User_fsm.updating_group)
 async def edit_user_group(msg: types.Message, state: FSMContext):
     try:
         async with async_session() as session:
@@ -79,7 +76,7 @@ async def edit_user_group(msg: types.Message, state: FSMContext):
     except Exception as error:
         print(error)
 
-@Registration_Router.callback_query(F.data == 'back_to_menu')
+@User_data_update_Router.callback_query(F.data == 'back_to_menu')
 async def menu_switch(callback: types.CallbackQuery):
     try:
         await callback.message.edit_text(text='Меню',reply_markup = main_menu)

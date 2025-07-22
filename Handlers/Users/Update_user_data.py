@@ -72,6 +72,8 @@ async def edit_user_group(msg: types.Message, state: FSMContext):
                                                  'group': data.get('group'),
                                                  'privileges': 'Ученик'
                                                  })
+
+            await state.set_data({})
             await state.set_state(User_fsm.update_over)
     except Exception as error:
         print(error)

@@ -26,8 +26,9 @@ class SubjectRepository(ISubjectRepository):
                             form = form,
                             group = group,
                             comment = comment,
-                            date = f'{timestamp} {editor}')
+                            date = f'{timestamp} @{editor}')
         self.session.add(new_note)
+        await self.session.commit()
         return new_note
 
 class SubjectService:
@@ -52,11 +53,6 @@ class SubjectService:
                                                     form = form,
                                                     group = group)
         return  result
-
-#class SubjectDTO:
-#    @staticmethod
-#    async def subject_text_show(subject: Subjects):
-#        return
 
 
 

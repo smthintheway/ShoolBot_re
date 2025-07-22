@@ -17,5 +17,10 @@ Edit_ask = [[InlineKeyboardButton(callback_data='edit',text='Изменить'),
             [InlineKeyboardButton(callback_data='back_to_menu',text='Назад')]]
 Edit_ask_keyboard = InlineKeyboardMarkup(inline_keyboard=Edit_ask)
 
+Types = [[InlineKeyboardButton(text='Текст', callback_data= 'text'),
+          InlineKeyboardButton(text='Фото', callback_data='photo'),
+          InlineKeyboardButton(text="Документ",callback_data='document')]]
+Types_keyboard = InlineKeyboardMarkup(inline_keyboard=Types)
+
 Menu_button = [[InlineKeyboardButton(callback_data='back_to_menu',text='Меню')]]
 Menu_button_keyboard = InlineKeyboardMarkup(inline_keyboard=Menu_button)

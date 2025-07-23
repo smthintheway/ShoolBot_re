@@ -50,12 +50,8 @@ async def edit_user_form(msg: types.Message,state: FSMContext):
 
 
 @User_data_update_Router.message(F.text, User_fsm.updating_group)
-async def edit_user_group(msg: types.Message, state: FSMContext):
+async def edit_user_group(msg: types.Message, state: FSMContext, user_service: UserService):
     try:
-        async with async_session() as session:
-            us_repo = UserRepository(session)
-            user_service = UserService(us_repo)
-
             await state.update_data(group = msg.text)
             data = await state.get_data()
             await msg.answer(text=user_info_template(

@@ -1,12 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from Infrastructure.Tables.Subjects import Subjects
+from sqlalchemy import and_
+from Infrastructure.Database.Tables.Subjects import Subjects
 from abc import ABC,abstractmethod
 import datetime
 
 class ISubjectRepository(ABC):
     @abstractmethod
-    async def add_new_note(self,subject_name, form, editor, timestamp, comment, hw_type, content , group = '0') -> Subjects: ...
+    async def add_new_note(self,subject_name, form, editor, timestamp, comment, hw_type, content , group) -> Subjects: ...
 
     @abstractmethod
     async def get_subject_task(self, subject_name, form, group) -> Subjects: ...
@@ -16,15 +17,17 @@ class SubjectRepository(ISubjectRepository):
         self.session = session
 
     async def get_subject_task(self,subject_name, form, group) -> Subjects:
-        result = await  self.session.execute(select(Subjects).filter(Subjects.subject_name == subject_name and (Subjects.form == form and Subjects.group in (group,'0'))).limit(1))
-        return result.scalar()
+        result = await self.session.execute(select(Subjects).filter(and_(
+            Subjects.subject_name == subject_name , Subjects.form == form , Subjects.group in (group,'0'))).limit(1))
+        print(result.scalars().all())
+        return result.scalars().all()
 
-    async def add_new_note(self,subject_name, form, editor, timestamp, comment, hw_type, content , group = 0) -> Subjects:
+    async def add_new_note(self,subject_name, form, editor, timestamp, comment, hw_type, content , group) -> Subjects:
         new_note = Subjects(subject_name = subject_name,
                             type = hw_type,
                             homework = content,
                             form = form,
-                            group = group,
+                            group = group+" 0",
                             comment = comment,
                             date = f'{timestamp} @{editor}')
         self.session.add(new_note)
@@ -52,7 +55,9 @@ class SubjectService:
         result = await self._repo.get_subject_task(subject_name = subject_name,
                                                     form = form,
                                                     group = group)
-        return  result
+
+
+        return result
 
 
 

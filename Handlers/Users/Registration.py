@@ -2,11 +2,11 @@ import json
 from aiogram.filters.command import Command
 from aiogram import types,Router,F
 from aiogram.fsm.context import FSMContext
-from sqlalchemy.ext.asyncio import async_session, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from Core.State_Fillters.User_State import User_fsm
 from Presentation.Templates.Registration import *
-from Services.UserService import UserService,UserRepository
+from Services.UserService import UserService
 from Presentation.Keyboards.Mini_keyboards import Menu_button_keyboard
 from Presentation.Keyboards.Main_menu import main_menu
 
@@ -17,11 +17,8 @@ Registration_Router = Router()
 
 
 @Registration_Router.message(Command('start'))
-async def start_handler(msg: types.Message,state: FSMContext):
+async def start_handler(msg: types.Message,state: FSMContext, user_service: UserService):
     try:
-        async with async_session() as session:
-            us_repo = UserRepository(session)
-            user_service = UserService(us_repo)
 
             check = await user_service.get_user_reg(msg.from_user.id)
             if check is None:
@@ -53,12 +50,8 @@ async def edit_user_form(msg: types.Message,state: FSMContext):
 
 
 @Registration_Router.message(F.text, User_fsm.updating_group)
-async def edit_user_group(msg: types.Message, state: FSMContext):
+async def edit_user_group(msg: types.Message, state: FSMContext, user_service: UserService):
     try:
-        async with async_session() as session:
-            us_repo = UserRepository(session)
-            user_service = UserService(us_repo)
-
             await state.update_data(group = msg.text)
             data = await state.get_data()
             await msg.answer(text=user_info_template(

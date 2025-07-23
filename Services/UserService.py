@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from Infrastructure.Tables.Users import Users
+from Infrastructure.Database.Tables.Users import Users
 from abc import ABC,abstractmethod
 
 class IUserRepository(ABC):
@@ -10,8 +10,9 @@ class IUserRepository(ABC):
     @abstractmethod
     async def reg_or_update(self,tg_id) -> Users: ...
 
-class UserRepository():
-    def __init__(self,session: AsyncSession):
+
+class UserRepository(IUserRepository):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
     async def get_user(self, tg_id: int) -> Users | None:

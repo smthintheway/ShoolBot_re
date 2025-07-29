@@ -2,7 +2,7 @@ from aiogram import Bot
 import json
 from aiogram.filters import BaseFilter
 from aiogram.types import Message, CallbackQuery
-from Services.UserService import UserService
+from Services.UserDataService import UserService
 
 with open('Core/settings.json') as f:
     config = json.load(f)

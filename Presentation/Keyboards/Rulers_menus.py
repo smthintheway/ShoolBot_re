@@ -1,10 +1,16 @@
 from aiogram.types import (InlineKeyboardButton,InlineKeyboardMarkup)
 
+super_admin_buttons = [[InlineKeyboardButton(callback_data='admin_list',text='Список администраторов')],
+                      [InlineKeyboardButton(callback_data='headman_list',text='Список старост')],
+                      [InlineKeyboardButton(callback_data='add_')],
+                      [InlineKeyboardButton(callback_data='add_headman',text='Добавить старосту')],
+                      [InlineKeyboardButton(callback_data='delete_headman',text='Удалить старосту')],
+                      [InlineKeyboardButton(callback_data='back_to_menu',text='Назад')]]
 
 admin_buttons = [[InlineKeyboardButton(callback_data='admin_list',text='Список администраторов')],
                       [InlineKeyboardButton(callback_data='headman_list',text='Список старост')],
-                      [InlineKeyboardButton(callback_data='manual_add_admin',text='Добавить старосту')],
-                      [InlineKeyboardButton(callback_data='manual_delete_admin',text='Удалить старосту')],
+                      [InlineKeyboardButton(callback_data='add_headman',text='Добавить старосту')],
+                      [InlineKeyboardButton(callback_data='delete_headman',text='Удалить старосту')],
                       [InlineKeyboardButton(callback_data='back_to_menu',text='Назад')]]
 
 admin_menu = InlineKeyboardMarkup(inline_keyboard=admin_buttons)

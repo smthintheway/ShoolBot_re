@@ -5,8 +5,8 @@ from sqlalchemy.orm import declarative_base
 database_engine = create_engine('sqlite:///main.db')
 Base = declarative_base()
 
-class Subjects(Base):
-    __tablename__ = 'Subjects'
+class Schedule(Base):
+    __tablename__ = 'Schedule'
 
     id = Column(Integer,primary_key=True)
     type = Column(String)

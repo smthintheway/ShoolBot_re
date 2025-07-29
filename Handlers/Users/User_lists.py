@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from Services.UsersListsService import ListService,ListRepository
-from Services.UserService import UserService, UserRepository
+from Services.UserDataService import UserService, UserRepository
 
 List_Router = Router()
 

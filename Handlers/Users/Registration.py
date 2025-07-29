@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from Core.State_Fillters.User_State import User_fsm
 from Presentation.Templates.Registration import *
-from Services.UserService import UserService
+from Services.UserDataService import UserService
 from Presentation.Keyboards.Mini_keyboards import Menu_button_keyboard
 from Presentation.Keyboards.Main_menu import main_menu
 
@@ -43,7 +43,7 @@ async def edit_user_form(msg: types.Message,state: FSMContext):
             await state.set_state(User_fsm.updating_group)
             await msg.answer(text=user_edit_group)
         else:
-            await msg.answer('Такого класса нет в списках\nЕсли произошла огибка обратитесь к администратору')
+            await msg.answer('Такого класса нет в списках\nЕсли произошла ошибка обратитесь к администратору')
             await msg.answer(text='Повторите попытку')
     except Exception as error:
         print(error)
@@ -73,9 +73,3 @@ async def edit_user_group(msg: types.Message, state: FSMContext, user_service: U
     except Exception as error:
         print(error)
 
-@Registration_Router.callback_query(F.data == 'back_to_menu')
-async def menu_switch(callback: types.CallbackQuery):
-    try:
-        await callback.message.edit_text(text='Меню',reply_markup = main_menu)
-    except Exception as error:
-        print(error)

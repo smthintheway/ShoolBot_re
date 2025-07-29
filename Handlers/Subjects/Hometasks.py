@@ -8,7 +8,7 @@ from Presentation.Templates.Subjects import subject_task_presentation
 from Core.State_Fillters.Subjects import Subject_actions
 from Core.Fillters.Headman_filter import IsHeadman
 from Services.SubjectService import SubjectService
-from Services.UserService import UserService
+from Services.UserDataService import UserService
 from Presentation.Keyboards.Mini_keyboards import Edit_ask_keyboard, Types_keyboard, Binary_keyboard,Menu_button_keyboard
 
 database_engine = create_async_engine('sqlite+aiosqlite:///main.db')
@@ -107,10 +107,12 @@ async def subject_edit_media(msg: types.Message,state: FSMContext):
 
          await state.update_data(content = new_content,
                                  media_content_count = rest_count -1)
+
          if rest_count >= 1:
             await msg.answer(text=f'Файл сохранен. Файлов осталось: {rest_count-1}')
 
-     if rest_count ==0:
+     if rest_count == 0:
+         await msg.answer(text='Хотите добавить коментарий?', reply_markup=Binary_keyboard)
          await state.set_state(Subject_actions.switch_comments)
 
 
@@ -122,7 +124,7 @@ async def subject_edit_text(msg: types.Message, state: FSMContext):
     await msg.answer(text = 'Хотите добавить коментарий?', reply_markup=Binary_keyboard)
     await state.set_state(Subject_actions.switch_comments)
 
-@Hometasks_Router.callback_query(F.data == 'yes', Subject_actions.switch_comments)
+@Hometasks_Router.callback_query(F.data == 'yes', Subject_actions.switch_comments, IsHeadman())
 async def hometask_edit_comment(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(text='Введите новый коментарий')
     await state.set_state(Subject_actions.edit_SubjectComment)
@@ -143,10 +145,10 @@ async def hometask_edit_over(callback: types.CallbackQuery, state: FSMContext, u
         await state.update_data({})
         await state.clear()
 
-@Hometasks_Router.callback_query(F.text, Subject_actions.edit_SubjectComment,IsHeadman())
+@Hometasks_Router.message(F.text, Subject_actions.edit_SubjectComment,IsHeadman())
 async def subject_edit_comment(msg: types.Message, state: FSMContext, user_service: UserService, subject_service: SubjectService):
+    await state.update_data(comment=msg.text)
     data = await state.get_data()
-    await state.update_data(comment = msg.text)
     await msg.answer(text='Изменение завершено', reply_markup=Menu_button_keyboard)
     user_data = await user_service.get_user_info(tg_id=msg.from_user.id)
     result = await subject_service.add_task(subject_name=data.get('subject_name'),
@@ -162,7 +164,7 @@ async def subject_edit_comment(msg: types.Message, state: FSMContext, user_servi
 
 @Hometasks_Router.callback_query(F.data == 'ask',Subject_actions.switch_choose)
 async def ask_start(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(text='Введи название интересующего предмета')
+    await callback.message.edit_text(text='Введи название интересующего предмета',reply_markup=Menu_button_keyboard)
     await state.set_state(Subject_actions.ask_SubjectName)
 
 @Hometasks_Router.message(F.text, Subject_actions.ask_SubjectName)

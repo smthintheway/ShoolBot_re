@@ -1,5 +1,5 @@
 from Presentation.Templates.Registration import user_info_template
-from Services.UserService import UserService,UserRepository
+from Services.UserDataService import UserService,UserRepository
 from Presentation.Keyboards.Mini_keyboards import Menu_button_keyboard
 from Presentation.Keyboards.Main_menu import main_menu
 from sqlalchemy.ext.asyncio import async_session, AsyncSession, create_async_engine

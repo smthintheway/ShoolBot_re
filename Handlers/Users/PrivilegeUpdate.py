@@ -12,8 +12,4 @@ from Presentation.Keyboards.Mini_keyboards import Edit_ask_keyboard, Types_keybo
 
 Privilege_Router = Router()
 
-@Privilege_Router.message(Command('add new admin'))
-async def add_new_admin(msg: types.Message, privilege_service: PrivilegeService, state: FSMContext):
-    await msg.edit_text(text='Введите id или имя пользователя')
-    await state.set_state(Privilege_update.choosing_person)
-    
+

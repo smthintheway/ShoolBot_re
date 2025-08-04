@@ -1,8 +1,7 @@
 import asyncio
 import logging
 import json
-
-from Core.di import Container, DIMiddleware#, DBMiddleware
+from Core.di import Container, DIMiddleware
 from aiogram import Bot, Dispatcher
 from Handlers.Users.Registration import Registration_Router
 from Handlers.Users.Update_user_data import User_data_update_Router
@@ -10,6 +9,7 @@ from Handlers.Users.User_lists import List_Router
 from Handlers.Users.Get_user_info import Get_user_info_Router
 from Handlers.Subjects.Schedule import Schedule_Router
 from Handlers.Subjects.Hometasks import Hometasks_Router
+from Handlers.Keyboard_creation.Ruler_menu_creation import RulerMenu_Router
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,6 +29,7 @@ async def main():
     ds.include_router(List_Router)
     ds.include_router(Hometasks_Router)
     ds.include_router(Schedule_Router)
+    ds.include_router(RulerMenu_Router)
     await ds.start_polling(bot)
 
 if __name__ == '__main__':
